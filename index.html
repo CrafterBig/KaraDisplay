@@ -149,7 +149,7 @@
                     const div_title = document.createElement("div");
                     div_title.classList.add("tatami_title");
                     tatamis.lastChild.appendChild(div_title);
-                    tatamis.lastChild.lastChild.textContent = `Tatami: ${parseInt(key) + 1}`
+                    tatamis.lastChild.lastChild.textContent = `Tatami ${parseInt(key) + 1}`
 
                     const subdivs = [["Letzte Kategorie", "last"], ["Aktuelle Kategorie", "current"], ["Nächste Kategorie", "next"]]
                     for (const index in subdivs) {
