@@ -98,7 +98,7 @@
 
 <body>
 
-    <div id="data" class="error">Waiting for data...</div>
+    <div id="data" class="error">Daten werden angefragt</div>
 
     <div id="tatamis" class="tatamis"></div>
         
@@ -124,7 +124,7 @@
             socket.onclose = () => {};
 
             socket.onerror = (error) => {
-                dataDiv.textContent = "Connection failed"
+                dataDiv.textContent = "Kein Zugriff auf aktuelle Daten"
             };
 
             socket.onmessage = (event) => {
