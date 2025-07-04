@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WebSocket Client</title>
+    <style>
+
+        body {
+            background-color: #1c1c1c;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+        }
+
+        .bottombar {
+            bottom: 0;
+            right: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2d2d2d;
+            position: sticky;
+            margin: 0;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottombar_text {
+            color: #7bc791;
+            font-size: 32px;
+            padding: 10px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .tatamis {
+            min-height: 100vh;
+        }
+
+        .tatami {
+            background-color: #272727;
+            margin: 20px;
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .tatami_title {
+            color: #ffffff;
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .tatami_element {
+            background-color: #313131;
+            margin: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            color: #3da457;
+            columns: 2;
+            font-size: 24px;
+        }
+
+        .tatami_element_left {
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .tatami_element_right {
+            text-align: right;
+            padding-right: 5px;
+            font-weight: 700;
+        }
+
+        .error {
+            background-color: #7f021f;
+            position: fixed;
+            width: 100%;
+            margin-top: 0;
+            z-index: 200;
+            color: #ffffff;
+            font-size: 32px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .error:empty {
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="data" class="error">Waiting for data...</div>
+
+    <div id="tatamis" class="tatamis"></div>
+        
+    <div id="bottombar" class="bottombar">
+        <div id="bottombar_text" class="bottombar_text"></div>
+    </div>
+
+    <script>
+
+        const data = {}
+        const dataDiv = document.getElementById('data');
+        const bottombar_textDiv = document.getElementById('bottombar_text');
+
+        localStorage.setItem("messageAge", new Date().getTime().toString())
+
+        function handlesocket() {
+
+            console.log("Connect socket")
+
+            const socket = new WebSocket('ws://2b68-212-100-44-250.ngrok-free.app');
+
+            socket.onopen = () => {};
+            socket.onclose = () => {};
+
+            socket.onerror = (error) => {
+                dataDiv.textContent = "Connection failed"
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                dataDiv.textContent = ""
+
+                bottombar_textDiv.textContent = data["title"]
+
+                const tatamis = document.getElementById("tatamis")
+
+                while (tatamis.firstChild) {
+                    tatamis.removeChild(tatamis.firstChild)
+                }
+
+                for (const key in data["tatamis"]) {
+                    
+                    const item = data["tatamis"][key];
+                    const newdiv = document.createElement("div");
+                    newdiv.classList.add("tatami");
+                    tatamis.appendChild(newdiv);
+
+                    const div_title = document.createElement("div");
+                    div_title.classList.add("tatami_title");
+                    tatamis.lastChild.appendChild(div_title);
+                    tatamis.lastChild.lastChild.textContent = `Tatami: ${parseInt(key) + 1}`
+
+                    const subdivs = [["Letzte Kategorie", "last"], ["Aktuelle Kategorie", "current"], ["Nächste Kategorie", "next"]]
+                    for (const index in subdivs) {
+                        
+                        const newdiv = document.createElement("div");
+                        newdiv.classList.add("tatami_element");
+
+                        const left = document.createElement("div")
+                        left.classList.add("tatami_element_left")
+                        left.textContent = subdivs[index][0]
+                        newdiv.appendChild(left)
+
+                        const right = document.createElement("div")
+                        right.classList.add("tatami_element_right")
+                        right.textContent = item[subdivs[index][1]]
+                        newdiv.appendChild(right)
+
+                        tatamis.lastChild.appendChild(newdiv);
+                    }
+
+                }
+
+                localStorage.setItem("messageAge", new Date().getTime().toString())
+            }
+        }
+
+        function checkMessageAge() {
+            
+            console.log("Check Message")
+            
+            const now = new Date().getTime()
+            const difference = now - parseInt(localStorage.getItem("messageAge"))
+
+            const age = localStorage.getItem("messageAge")
+            if (! age) return
+            
+            if (difference > 20000) handlesocket()
+        }
+
+        handlesocket()
+        setInterval(checkMessageAge, 20000)
+
+    </script>
+
+</body>
+</html>
