@@ -9,7 +9,7 @@ async function refreshData()
 {
     console.log("1")
 
-    let res = await fetch("https://we-courtesy.gl.at.ply.gg:14926/api/v1", {
+    let res = await fetch("http://we-courtesy.gl.at.ply.gg:14926/api/v1", {
         method: "GET"
     })
     const json = await res.json()
